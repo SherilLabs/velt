@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#10111a" />
+  <meta name="description" content="VAULT — personal savings tracker." />
+  <title>VAULT — Savings Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#overview" aria-label="VAULT home">
+        <span class="brand-mark"><i data-lucide="layers"></i></span>
+        <span>VAULT<span class="brand-dot">.</span><small>PERSONAL FINANCE</small></span>
+      </a>
+      <div class="nav-label">WORKSPACE</div>
+      <nav class="nav-list" aria-label="Main navigation">
+        <button class="nav-link active" data-page="overview"><i data-lucide="layout-dashboard"></i>Overview</button>
+        <button class="nav-link" data-page="transactions"><i data-lucide="arrow-left-right"></i>Transactions</button>
+        <button class="nav-link" data-page="goals"><i data-lucide="target"></i>Saving goals</button>
+        <button class="nav-link" data-page="calendar"><i data-lucide="calendar-days"></i>Calendar</button>
+        <button class="nav-link" data-page="insights"><i data-lucide="chart-no-axes-combined"></i>Insights</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="storage-card">
+          <span class="storage-icon"><i data-lucide="shield-check"></i></span>
+          <strong>Your data stays local</strong>
+          <p>Data tersimpan di browser perangkat ini.</p>
+          <button class="text-button" data-page="backup">Backup data <i data-lucide="arrow-up-right"></i></button>
+        </div>
+        <div class="profile-row">
+          <div class="avatar">V</div>
+          <div><strong>My Vault</strong><small>Personal account</small></div>
+          <button class="icon-button small" id="settingsShortcut" aria-label="Backup settings"><i data-lucide="settings-2"></i></button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="icon-button menu-toggle" id="menuToggle" aria-label="Open menu"><i data-lucide="menu"></i></button>
+        <div class="breadcrumb"><span>Workspace</span><i data-lucide="chevron-right"></i><strong id="breadcrumbTitle">Overview</strong></div>
+        <div class="topbar-actions">
+          <span class="today-label" id="todayLabel"></span>
+          <button class="icon-button" id="quickAdd" aria-label="Add transaction" title="Tambah transaksi"><i data-lucide="plus"></i></button>
+          <button class="avatar avatar-small" id="topBackup" aria-label="Backup data" title="Backup data">V</button>
+        </div>
+      </header>
+
+      <section class="page active" id="page-overview">
+        <div class="page-heading">
+          <div><p class="eyebrow">YOUR FINANCIAL SPACE</p><h1>Overview<span class="heading-period">.</span></h1><p class="subheading">Pelan-pelan, yang penting uangmu punya arah.</p></div>
+          <button class="button button-primary" id="addTransactionBtn"><i data-lucide="plus"></i> Add transaction</button>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card balance-card">
+            <div class="stat-top"><span>Total balance</span><span class="stat-icon lavender"><i data-lucide="wallet"></i></span></div>
+            <div class="stat-value" id="totalBalance">Rp0</div>
+            <div class="stat-foot"><span class="status-dot"></span><span>Saldo berdasarkan semua transaksi</span></div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span>Total income</span><span class="stat-icon green"><i data-lucide="trending-up"></i></span></div>
+            <div class="stat-value" id="totalIncome">Rp0</div>
+            <div class="stat-foot"><span class="foot-muted" id="incomePeriod">Bulan ini</span></div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span>Total expenses</span><span class="stat-icon rose"><i data-lucide="trending-down"></i></span></div>
+            <div class="stat-value" id="totalExpense">Rp0</div>
+            <div class="stat-foot"><span class="foot-muted" id="expensePeriod">Bulan ini</span></div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span>Saved this month</span><span class="stat-icon blue"><i data-lucide="piggy-bank"></i></span></div>
+            <div class="stat-value" id="monthlySaved">Rp0</div>
+            <div class="stat-foot"><span class="foot-muted">Pemasukan dikurangi pengeluaran</span></div>
+          </article>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="panel chart-panel">
+            <div class="panel-heading"><div><h2>Money flow</h2><p>Perbandingan pemasukan dan pengeluaran</p></div><select class="select-control" id="flowPeriod" aria-label="Periode grafik"><option value="6">6 months</option><option value="12">12 months</option></select></div>
+            <div class="chart-wrap"><canvas id="flowChart" aria-label="Grafik pemasukan dan pengeluaran"></canvas></div>
+            <div class="chart-legend"><span><i class="legend-dot income-dot"></i>Income</span><span><i class="legend-dot expense-dot"></i>Expenses</span></div>
+          </article>
+          <article class="panel goals-preview">
+            <div class="panel-heading"><div><h2>Saving goals</h2><p>Hal yang sedang kamu tuju</p></div><button class="link-button" data-page="goals">View all <i data-lucide="arrow-up-right"></i></button></div>
+            <div id="overviewGoals" class="goal-list compact-list"></div>
+            <button class="button button-secondary button-full" data-page="goals"><i data-lucide="plus"></i> Create a goal</button>
+          </article>
+          <article class="panel recent-panel">
+            <div class="panel-heading"><div><h2>Recent transactions</h2><p>Aktivitas keuangan terbaru</p></div><button class="link-button" data-page="transactions">View all <i data-lucide="arrow-up-right"></i></button></div>
+            <div class="table-wrap"><table><thead><tr><th>Transaction</th><th>Date</th><th>Category</th><th class="align-right">Amount</th></tr></thead><tbody id="recentTransactions"></tbody></table></div>
+            <div class="empty-state hidden" id="recentEmpty"><i data-lucide="receipt-text"></i><strong>Belum ada transaksi</strong><p>Tambahkan transaksi pertama untuk mulai melihat ringkasan.</p></div>
+          </article>
+          <article class="panel category-panel">
+            <div class="panel-heading"><div><h2>Spending breakdown</h2><p>Pengeluaran berdasarkan kategori bulan ini</p></div></div>
+            <div class="category-chart-wrap"><canvas id="categoryChart" aria-label="Grafik kategori pengeluaran"></canvas><div id="categoryChartCenter" class="donut-center"><strong>Rp0</strong><span>spent this month</span></div></div>
+            <div id="categoryLegend" class="category-legend"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="page" id="page-transactions">
+        <div class="page-heading"><div><p class="eyebrow">MONEY IN, MONEY OUT</p><h1>Transactions<span class="heading-period">.</span></h1><p class="subheading">Catat uang masuk dan keluar dengan rapi.</p></div><button class="button button-primary" id="addTransactionBtn2"><i data-lucide="plus"></i> Add transaction</button></div>
+        <article class="panel">
+          <div class="toolbar"><div class="search-box"><i data-lucide="search"></i><input id="transactionSearch" type="search" placeholder="Cari transaksi..." /></div><select id="typeFilter" class="select-control"><option value="all">Semua tipe</option><option value="income">Pemasukan</option><option value="expense">Pengeluaran</option></select><select id="categoryFilter" class="select-control"><option value="all">Semua kategori</option></select><button class="button button-secondary" id="exportCsvBtn"><i data-lucide="download"></i> Export CSV</button></div>
+          <div class="table-wrap"><table class="wide-table"><thead><tr><th>Transaction</th><th>Date</th><th>Type</th><th>Category</th><th>Notes</th><th class="align-right">Amount</th><th></th></tr></thead><tbody id="allTransactions"></tbody></table></div>
+          <div class="empty-state hidden" id="transactionsEmpty"><i data-lucide="receipt-text"></i><strong>Tidak ada transaksi ditemukan</strong><p>Coba ubah filter atau tambahkan transaksi baru.</p></div>
+          <div class="table-footer"><span id="transactionCount">0 transaksi</span><button class="text-button" id="clearFilters">Reset filter</button></div>
+        </article>
+      </section>
+
+      <section class="page" id="page-goals">
+        <div class="page-heading"><div><p class="eyebrow">SAVE WITH PURPOSE</p><h1>Saving goals<span class="heading-period">.</span></h1><p class="subheading">Target kecil hari ini, langkah besar nanti.</p></div><button class="button button-primary" id="addGoalBtn"><i data-lucide="plus"></i> Create goal</button></div>
+        <div class="goal-summary-grid" id="goalSummary"></div>
+        <div class="goals-grid" id="allGoals"></div>
+        <div class="empty-state hidden panel" id="goalsEmpty"><i data-lucide="target"></i><strong>Belum ada target tabungan</strong><p>Buat target pertama dan pantau progresnya di sini.</p><button class="button button-primary" id="emptyAddGoal"><i data-lucide="plus"></i> Create goal</button></div>
+      </section>
+
+      <section class="page" id="page-calendar">
+        <div class="page-heading"><div><p class="eyebrow">YOUR MONEY HABITS</p><h1>Calendar<span class="heading-period">.</span></h1><p class="subheading">Lihat aktivitas keuangan berdasarkan tanggal.</p></div><button class="button button-primary" id="calendarAdd"><i data-lucide="plus"></i> Add transaction</button></div>
+        <article class="panel calendar-panel">
+          <div class="calendar-head"><button class="icon-button" id="prevMonth" aria-label="Bulan sebelumnya"><i data-lucide="chevron-left"></i></button><h2 id="calendarMonth">Month Year</h2><button class="icon-button" id="nextMonth" aria-label="Bulan berikutnya"><i data-lucide="chevron-right"></i></button><button class="button button-secondary today-button" id="calendarToday">Today</button></div>
+          <div class="calendar-weekdays"><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span></div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+          <div class="calendar-key"><span><i class="legend-dot income-dot"></i>Income</span><span><i class="legend-dot expense-dot"></i>Expenses</span><span class="calendar-hint">Pilih tanggal untuk melihat detail.</span></div>
+        </article>
+        <article class="panel selected-day-panel"><div class="panel-heading"><div><h2 id="selectedDayTitle">Selected date</h2><p id="selectedDaySummary">Pilih tanggal di kalender.</p></div></div><div id="selectedDayTransactions" class="day-transactions"></div></article>
+      </section>
+
+      <section class="page" id="page-insights">
+        <div class="page-heading"><div><p class="eyebrow">KNOW YOUR HABITS</p><h1>Insights<span class="heading-period">.</span></h1><p class="subheading">Kenali pola keuanganmu, tanpa menghakimi diri sendiri.</p></div></div>
+        <div class="stats-grid insights-stats" id="insightStats"></div>
+        <div class="dashboard-grid insights-grid">
+          <article class="panel"><div class="panel-heading"><div><h2>Balance trend</h2><p>Perubahan saldo bersih tiap bulan</p></div></div><div class="chart-wrap"><canvas id="balanceChart"></canvas></div></article>
+          <article class="panel"><div class="panel-heading"><div><h2>Where money goes</h2><p>Akumulasi pengeluaran berdasarkan kategori</p></div></div><div class="chart-wrap"><canvas id="insightCategoryChart"></canvas></div></article>
+          <article class="panel insight-note-panel"><div class="panel-heading"><div><h2>Your monthly recap</h2><p>Ringkasan berdasarkan data yang kamu catat</p></div></div><div id="monthlyRecap" class="recap-content"></div></article>
+        </div>
+      </section>
+
+      <section class="page" id="page-backup">
+        <div class="page-heading"><div><p class="eyebrow">KEEP IT SAFE</p><h1>Data & backup<span class="heading-period">.</span></h1><p class="subheading">Data tersimpan di browser ini. Backup rutin sangat disarankan.</p></div></div>
+        <div class="backup-grid">
+          <article class="panel backup-card"><span class="large-panel-icon"><i data-lucide="download"></i></span><h2>Export backup</h2><p>Unduh semua transaksi dan target sebagai file JSON. Gunakan file ini untuk memulihkan data nanti.</p><button class="button button-primary" id="exportJsonBtn"><i data-lucide="download"></i> Download backup</button></article>
+          <article class="panel backup-card"><span class="large-panel-icon"><i data-lucide="upload"></i></span><h2>Restore backup</h2><p>Impor file backup VAULT yang sebelumnya kamu ekspor. Data yang ada akan diganti dengan data dari file tersebut.</p><label class="button button-secondary file-button"><i data-lucide="file-up"></i> Choose JSON file<input type="file" id="importJsonInput" accept=".json,application/json" hidden /></label></article>
+          <article class="panel backup-card danger-zone"><span class="large-panel-icon"><i data-lucide="trash-2"></i></span><h2>Reset all data</h2><p>Hapus semua transaksi dan target dari browser ini. Tindakan ini tidak bisa dibatalkan kecuali kamu punya backup.</p><button class="button button-danger" id="resetDataBtn"><i data-lucide="trash-2"></i> Reset data</button></article>
+        </div>
+        <article class="panel privacy-note"><i data-lucide="shield-check"></i><div><strong>Privacy note</strong><p>VAULT versi ini tidak terhubung ke bank atau server. Jangan gunakan sebagai satu-satunya arsip keuangan. File backup JSON berisi data pribadi—simpan di tempat yang aman.</p></div></article>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop hidden" id="transactionModal" role="dialog" aria-modal="true" aria-labelledby="transactionModalTitle">
+    <form class="modal" id="transactionForm">
+      <div class="modal-heading"><div><p class="eyebrow">KEEP YOUR RECORDS CLEAR</p><h2 id="transactionModalTitle">Add transaction</h2></div><button type="button" class="icon-button" data-close="transactionModal" aria-label="Close"><i data-lucide="x"></i></button></div>
+      <input type="hidden" id="transactionId" />
+      <div class="field"><label>Transaction name</label><input id="transactionName" required maxlength="70" placeholder="Contoh: Uang bulanan" /></div>
+      <div class="field"><label>Type</label><div class="segmented"><label><input type="radio" name="transactionType" value="income" checked><span><i data-lucide="trending-up"></i> Pemasukan</span></label><label><input type="radio" name="transactionType" value="expense"><span><i data-lucide="trending-down"></i> Pengeluaran</span></label></div></div>
+      <div class="form-two-col"><div class="field"><label>Amount (Rp)</label><input id="transactionAmount" type="number" min="1" step="1" required placeholder="50000" /></div><div class="field"><label>Date</label><input id="transactionDate" type="date" required /></div></div>
+      <div class="form-two-col"><div class="field"><label>Category</label><select id="transactionCategory" required></select></div><div class="field"><label>Payment method</label><select id="transactionMethod"><option>Tunai</option><option>Transfer</option><option>E-wallet</option><option>Lainnya</option></select></div></div>
+      <div class="field"><label>Notes <span class="optional">(optional)</span></label><textarea id="transactionNotes" rows="2" maxlength="180" placeholder="Catatan singkat..."></textarea></div>
+      <div class="modal-actions"><button type="button" class="button button-secondary" data-close="transactionModal">Cancel</button><button type="submit" class="button button-primary"><i data-lucide="check"></i> Save transaction</button></div>
+    </form>
+  </div>
+
+  <div class="modal-backdrop hidden" id="goalModal" role="dialog" aria-modal="true" aria-labelledby="goalModalTitle">
+    <form class="modal" id="goalForm">
+      <div class="modal-heading"><div><p class="eyebrow">MAKE IT HAPPEN</p><h2 id="goalModalTitle">Create saving goal</h2></div><button type="button" class="icon-button" data-close="goalModal" aria-label="Close"><i data-lucide="x"></i></button></div>
+      <input type="hidden" id="goalId" />
+      <div class="field"><label>Goal name</label><input id="goalName" required maxlength="60" placeholder="Contoh: Laptop baru" /></div>
+      <div class="form-two-col"><div class="field"><label>Target amount (Rp)</label><input id="goalTarget" type="number" min="1" step="1" required placeholder="2500000" /></div><div class="field"><label>Already saved (Rp)</label><input id="goalSaved" type="number" min="0" step="1" required value="0" /></div></div>
+      <div class="form-two-col"><div class="field"><label>Deadline <span class="optional">(optional)</span></label><input id="goalDeadline" type="date" /></div><div class="field"><label>Icon</label><select id="goalIcon"><option value="laptop">Laptop</option><option value="shield">Emergency fund</option><option value="graduation-cap">Education</option><option value="heart">Personal</option><option value="plane">Travel</option><option value="gem">Other</option></select></div></div>
+      <div class="field"><label>Short note <span class="optional">(optional)</span></label><input id="goalNote" maxlength="100" placeholder="Kenapa target ini penting buatmu?" /></div>
+      <div class="modal-actions"><button type="button" class="button button-secondary" data-close="goalModal">Cancel</button><button type="submit" class="button button-primary"><i data-lucide="check"></i> Save goal</button></div>
+    </form>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="app.js"></script>
+</body>
+</html>
